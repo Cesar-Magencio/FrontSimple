@@ -2,7 +2,6 @@ import { login } from "../config/urlapis";
 
 export const loginCheck = async (dni, password) => {
   //peticion a la url
-  console.log(dni, password);
   const res = await fetch(login, {
     method: "POST",
     headers: {

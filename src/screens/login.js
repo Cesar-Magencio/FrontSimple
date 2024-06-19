@@ -13,6 +13,7 @@ import { useState } from "react";
 import { PassInput } from "../components/passinput";
 import { Botonn } from "../components/boton";
 import { loginCheck } from "../apis/login";
+import { save } from "../utils/storage";
 
 export default Login = ({ navigation }) => {
   const [dni, setDni] = useState();
@@ -22,8 +23,15 @@ export default Login = ({ navigation }) => {
     //comprobar success, guardar el token, enviarme a la siguiente pantalla
 
     const Data = await loginCheck(dni, password);
-    console.log(Data.token);
-    navigation.navigate("tabs");
+
+    if (Data.success) {
+      const result = await save("token", Data.token);
+
+      navigation.navigate("tabs");
+    } else {
+      //primer tarea:
+      //mostrar un mensaje al usuario: "usuario o contraseña incorrecto"
+    }
   };
 
   return (
