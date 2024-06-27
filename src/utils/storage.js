@@ -12,6 +12,17 @@ export const save = async (key, value) => {
 };
 
 // Obtener un valor
+export const get = async (key) => {
+  try {
+    const value = await SecureStore.getItemAsync(key);
+    return value;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+// Obtener un valor
 export const getValueFor = async (key) => {
   try {
     let result = await SecureStore.getItemAsync(key);

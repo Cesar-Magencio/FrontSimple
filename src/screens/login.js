@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -6,31 +7,34 @@ import {
   Platform,
   ImageBackground,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { primaryColor } from "../config/colors";
 import { Input } from "../components/input";
-import { useState } from "react";
 import { PassInput } from "../components/passinput";
 import { Botonn } from "../components/boton";
 import { loginCheck } from "../apis/login";
 import { save } from "../utils/storage";
 
-export default Login = ({ navigation }) => {
+const Login = ({ navigation }) => {
   const [dni, setDni] = useState();
   const [password, setPassword] = useState();
 
   const handleValidar = async () => {
-    //comprobar success, guardar el token, enviarme a la siguiente pantalla
+    try {
+      const Data = await loginCheck(dni, password);
 
-    const Data = await loginCheck(dni, password);
+      console.log(Data);
+      if (Data.success) {
+        await save("token", Data.token);
 
-    if (Data.success) {
-      const result = await save("token", Data.token);
-
-      navigation.navigate("tabs");
-    } else {
-      //primer tarea:
-      //mostrar un mensaje al usuario: "usuario o contraseña incorrecto"
+        navigation.navigate("tabs");
+      } else {
+        Alert.alert("Error", "Usuario o contraseña incorrectos");
+      }
+    } catch (error) {
+      console.error("Error al intentar iniciar sesión:", error);
+      Alert.alert("Error", "Ocurrió un error al intentar iniciar sesión");
     }
   };
 
@@ -46,10 +50,7 @@ export default Login = ({ navigation }) => {
         <ImageBackground
           source={require("../../assets/fondo.jpg")}
           resizeMode="cover"
-          style={{
-            flex: 1,
-            backgroundColor: "gray",
-          }}
+          style={{ flex: 1, backgroundColor: "gray" }}
         >
           <View style={styles.logo}>
             <Image
@@ -68,23 +69,22 @@ export default Login = ({ navigation }) => {
           </View>
           <View style={styles.inputs}>
             <Input
-              label="ingrese su dni"
+              label="Ingrese su DNI"
               value={dni}
-              onChage={setDni}
+              onChange={setDni}
               icon="alien"
               type="numeric"
             />
             <PassInput
-              label="ingresa tu contraseña"
+              label="Ingrese su contraseña"
               value={password}
               onChange={setPassword}
             />
-
-            <Botonn title="ingresar" onPress={() => handleValidar()} />
-            <Botonn title="crear cuenta" mode="outlined" />
+            <Botonn title="Ingresar" onPress={handleValidar} />
+            <Botonn title="Crear cuenta" mode="outlined" />
           </View>
           <View style={styles.olvide}>
-            <Text>proximamente</Text>
+            <Text>Próximamente</Text>
           </View>
         </ImageBackground>
       </View>
@@ -93,8 +93,6 @@ export default Login = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  texto: {},
   logo: {
     flex: 0.5,
     alignItems: "center",
@@ -110,3 +108,5 @@ const styles = StyleSheet.create({
     flex: 0.1,
   },
 });
+
+export default Login;
